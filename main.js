@@ -1,5 +1,6 @@
 import './style.css'
 import * as Three from 'three'
+import fontJson from './font.json'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 //Initial Scene
@@ -17,13 +18,15 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 //Move the camera
-camera.position.setZ(10);
-camera.position.setY(3)
+//{x: 3.586390045718128, y: 15.641571618976387, z: 27.99656780271317}
+camera.position.setZ(28);
+camera.position.setY(16);
+camera.position.setX(4)
 
 //Lighting
 const ambientLight = new Three.AmbientLight(0xffffff);
-//const pointLight = new Three.PointLight(0xffffff);
-//pointLight.position.set(0,0,0)
+const pointLight = new Three.PointLight(0xffffff);
+pointLight.position.set(0,0,0)
 scene.add(ambientLight/*,pointLight*/);
 
 //Add Mouse Detection
@@ -53,7 +56,7 @@ var geometry = new Three.IcosahedronGeometry(5,1);
 geometry.name = "name"
 var material = new Three.MeshPhongMaterial({color:0x8c57ff, wireframe: true})
 const shape = new Three.Mesh(geometry,material)
-shape.position.set(0,30,0)
+shape.position.set(0,0,0)
 scene.add(shape)
 
 //Create Icosahedron Shape fuchsia
@@ -61,7 +64,7 @@ var geometry = new Three.IcosahedronGeometry(6,1);
 geometry.name = "fuchsia"
 var material = new Three.MeshPhongMaterial({color:0xbb42fc, wireframe: true})
 const shape2 = new Three.Mesh(geometry,material)
-shape2.position.set(20,30,10)
+shape2.position.set(15,-5,10)
 scene.add(shape2)
 
 //Create Icosahedron Shape techone
@@ -69,7 +72,7 @@ var geometry = new Three.IcosahedronGeometry(4,1);
 geometry.name = "techone"
 var material = new Three.MeshPhongMaterial({color:0x47ff63, wireframe: true})
 const shape3 = new Three.Mesh(geometry,material)
-shape3.position.set(-10,45,-10)
+shape3.position.set(-10,5,-10)
 scene.add(shape3)
 
 //Create Icosahedron Shape contact
@@ -77,8 +80,18 @@ var geometry = new Three.IcosahedronGeometry(5,1);
 geometry.name = "contact"
 var material = new Three.MeshPhongMaterial({color:0x44b0fc, wireframe: true})
 const shape4 = new Three.Mesh(geometry,material)
-shape4.position.set(-15,30,10)
+shape4.position.set(-15,0,10)
 scene.add(shape4)
+
+//Create Icosahedron Shape github
+var geometry = new Three.IcosahedronGeometry(5,1);
+geometry.name = "github"
+var material = new Three.MeshPhongMaterial({color:0x878787, wireframe: true})
+const shape5 = new Three.Mesh(geometry,material)
+shape5.position.set(15,10,-10)
+scene.add(shape5)
+
+var shapeList = [shape,shape2,shape3,shape4,shape5]
 
 //Add Particles
 function addParticles() {
@@ -88,26 +101,66 @@ function addParticles() {
   const [x,y,z] = Array(3).fill().map(() => Three.MathUtils.randFloatSpread(100));
   particle.position.set(x,y,z);
   scene.add(particle)
+  return particle
 }
-Array(1000).fill().forEach(addParticles)
+var stars = []
+
+for(var i = 0; i<1000; i++) {
+  var s = addParticles()
+  stars.push(s)
+}
 
 //Variables for mouse detection
 var IntersectedObject;
 var interval;
 var i = 0;
+var text = {}
 function renderScene() {
   requestAnimationFrame(renderScene);
   renderer.render(scene,camera)
   //Move Light Around
-  //pointLight.position.set(camera.position.x,camera.position.y,camera.position.z)
+  pointLight.position.set(camera.position.x,camera.position.y,camera.position.z)
   //Orbit Camera
   //camera.translateX(0.02)
   //camera.rotateY(0.02)
   //Helper Controls
   controls.update();
-  controls.enablePan = true;
-  controls.enableZoom = true;
+  controls.enablePan = false;
+  controls.enableZoom = false;
 
+  //rotate planets
+  shape.rotateY(0.002)
+  shape2.rotateY(0.002)
+  shape3.rotateY(0.002)
+  shape4.rotateY(0.002)
+  shape5.rotateY(0.002)
+
+  //rotate stars
+  stars.forEach(star => {
+    //star.rotateY(0.002)
+    star.translateZ(0.05)
+    if(star.position.z  > 50) star.translateZ(-100)
+  })
+
+  function createText(text,color) {
+    const font = new Three.Font(fontJson)
+    var geometry = new Three.TextGeometry(text,{
+      font:font,
+      size: 1,
+      height: 1,
+      curveSegments: 12,
+      bevelEnabled: false,
+      bevelThickness: 10,
+      bevelSize: 8,
+      bevelOffset: 0,
+      bevelSegments: 5
+    })
+    var material = new Three.MeshPhongMaterial({color:color, wireframe: true})
+    var texts = new Three.Mesh(geometry,material)
+    return texts
+  }
+  
+    
   // update the picking ray with the camera and mouse position
 	raycaster.setFromCamera( mouse, camera );
 	// calculate objects intersecting the picking ray
@@ -123,25 +176,33 @@ function renderScene() {
       IntersectedObject = intersects[0].object;
       switch(IntersectedObject.geometry.name) {
         case 'name':
+          text[textName] = createText("james xu",0x8c57ff)
+          textName.position.set(6,3,0)
+          scene.add(textName)
+          //shapeList.forEach(shape => shape.scale.set(1,1,1))
           clearInterval(interval)
           break;
         case 'contact':
+          //shapeList.forEach(shape => shape.scale.set(1,1,1))
           clearInterval(interval)
           break;
         case 'fuchsia':
+          //shapeList.forEach(shape => shape.scale.set(1,1,1))
           clearInterval(interval)
           break;
         case 'techone':
+          //shapeList.forEach(shape => shape.scale.set(1,1,1))
           clearInterval(interval)
           break;
         default:
           break;
       }
+      
       if(IntersectedObject.geometry.name != '') IntersectedObject.currentHex = IntersectedObject.material.emissive.getHex();
       if(IntersectedObject.geometry.name != '') IntersectedObject.material.emissive.setHex(0xff0000);
       if(IntersectedObject.geometry.name != '') interval = setInterval(() => {
         i+=1;
-        IntersectedObject.rotateY(0.01);
+        IntersectedObject.rotateY(-0.01);
         if(i<20) {IntersectedObject.scale.set(1+i/100,1+i/100,1+i/100)};
       },10)
       
@@ -151,7 +212,11 @@ function renderScene() {
       clearInterval(interval)
       IntersectedObject.scale.set(1,1,1)
       IntersectedObject.material.emissive.setHex( IntersectedObject.currentHex || 0);
-      
+      try {
+        text[textName].lookAt(camera.location)
+      }catch(error) {
+        console.log(error)
+      }
     }
     IntersectedObject = null;
   }
