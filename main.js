@@ -62,7 +62,7 @@ scene.add(shape)
 //Create Icosahedron Shape fuchsia
 var geometry = new Three.IcosahedronGeometry(6,1);
 geometry.name = "fuchsia"
-var material = new Three.MeshPhongMaterial({color:0xbb42fc, wireframe: true})
+var material = new Three.MeshPhongMaterial({color:0xff6666, wireframe: true})
 const shape2 = new Three.Mesh(geometry,material)
 shape2.position.set(15,-5,10)
 scene.add(shape2)
@@ -114,7 +114,8 @@ for(var i = 0; i<1000; i++) {
 var IntersectedObject;
 var interval;
 var i = 0;
-var text = {}
+var textName,textContact
+
 function renderScene() {
   requestAnimationFrame(renderScene);
   renderer.render(scene,camera)
@@ -160,6 +161,13 @@ function renderScene() {
     return texts
   }
   
+  //Make all text face camera
+  try {
+    textName.lookAt(camera.position)
+    textContact.lookAt(camera.position)
+  }catch(error) {
+    console.log(error)
+  }
     
   // update the picking ray with the camera and mouse position
 	raycaster.setFromCamera( mouse, camera );
@@ -176,23 +184,22 @@ function renderScene() {
       IntersectedObject = intersects[0].object;
       switch(IntersectedObject.geometry.name) {
         case 'name':
-          text[textName] = createText("james xu",0x8c57ff)
-          textName.position.set(6,3,0)
-          scene.add(textName)
-          //shapeList.forEach(shape => shape.scale.set(1,1,1))
-          clearInterval(interval)
+          if(!textName) textName = createText("james xu",0x8c57ff),textName.position.set(6,3,0),scene.add(textName)
+          shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         case 'contact':
-          //shapeList.forEach(shape => shape.scale.set(1,1,1))
-          clearInterval(interval)
+          if(!textContact) textContact = createText("james@jamesxu.dev",0x8c57ff),textContact.position.set(-15,0,10),scene.add(textContact)
+          shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         case 'fuchsia':
-          //shapeList.forEach(shape => shape.scale.set(1,1,1))
-          clearInterval(interval)
+          shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         case 'techone':
-          //shapeList.forEach(shape => shape.scale.set(1,1,1))
-          clearInterval(interval)
+          shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
+          
+          break;
+        case 'github':
+          shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         default:
           break;
@@ -212,11 +219,6 @@ function renderScene() {
       clearInterval(interval)
       IntersectedObject.scale.set(1,1,1)
       IntersectedObject.material.emissive.setHex( IntersectedObject.currentHex || 0);
-      try {
-        text[textName].lookAt(camera.location)
-      }catch(error) {
-        console.log(error)
-      }
     }
     IntersectedObject = null;
   }
