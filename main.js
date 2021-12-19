@@ -50,7 +50,7 @@ const gridHelper = new Three.GridHelper(200,50)
 //scene.add(lightHelper)
 const controls = new OrbitControls(camera, renderer.domElement);
 
-
+/*
 //Create Icosahedron Shape name
 var geometry = new Three.IcosahedronGeometry(5,1);
 geometry.name = "name"
@@ -91,7 +91,7 @@ const shape5 = new Three.Mesh(geometry,material)
 shape5.position.set(15,10,-10)
 scene.add(shape5)
 
-var shapeList = [shape,shape2,shape3,shape4,shape5]
+var shapeList = [shape,shape2,shape3,shape4,shape5]*/
 
 //Add Particles
 function addParticles() {
@@ -105,7 +105,7 @@ function addParticles() {
 }
 var stars = []
 
-for(var i = 0; i<1000; i++) {
+for(var i = 0; i<2000; i++) {
   var s = addParticles()
   stars.push(s)
 }
@@ -126,15 +126,15 @@ function renderScene() {
   camera.rotateY(0.02)
   //Helper Controls
   controls.update();
-  controls.enablePan = true;
-  controls.enableZoom = true;
+  controls.enablePan = false;
+  controls.enableZoom = false;
 
-  //rotate planets
+  /*/rotate planets
   shape.rotateY(0.002)
   shape2.rotateY(0.002)
   shape3.rotateY(0.002)
   shape4.rotateY(0.002)
-  shape5.rotateY(0.002)
+  shape5.rotateY(0.002)*/
 
   //rotate stars
   stars.forEach(star => {
@@ -184,11 +184,11 @@ function renderScene() {
       IntersectedObject = intersects[0].object;
       switch(IntersectedObject.geometry.name) {
         case 'name':
-          if(!textName) textName = createText("james xu",0x8c57ff),textName.position.set(6,3,0),scene.add(textName)
+          //if(!textName) textName = createText("james xu",0x8c57ff),textName.position.set(6,3,0),scene.add(textName)
           shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         case 'contact':
-          if(!textContact) textContact = createText("james@jamesxu.dev",0x8c57ff),textContact.position.set(-15,0,10),scene.add(textContact)
+          //if(!textContact) textContact = createText("james@jamesxu.dev",0x8c57ff),textContact.position.set(-15,0,10),scene.add(textContact)
           shapeList.forEach(shape => {if(shape.geometry.name != IntersectedObject.geometry.name) shape.scale.set(1,1,1),clearInterval(interval)})
           break;
         case 'fuchsia':
