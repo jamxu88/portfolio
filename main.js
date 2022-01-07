@@ -2,6 +2,10 @@ import './style.css'
 import * as Three from 'three'
 import fontJson from './font.json'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+const loader = new GLTFLoader();
+
 
 //Initial Scene
 const scene = new Three.Scene();
@@ -18,10 +22,22 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 //Move the camera
-//{x: 3.586390045718128, y: 15.641571618976387, z: 27.99656780271317}
 camera.position.setZ(28);
 camera.position.setY(16);
 camera.position.setX(4)
+
+loader.load( './models/earth.gltf', function ( gltf ) {
+  gltf.scene.scale.set(.1,.1,.1)
+  
+
+	scene.add( gltf.scene );
+
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
+
 
 //Lighting
 const ambientLight = new Three.AmbientLight(0xffffff);
@@ -32,12 +48,18 @@ scene.add(ambientLight/*,pointLight*/);
 //Add Mouse Detection
 const raycaster = new Three.Raycaster();
 const mouse = new Three.Vector2();
+var mouseTolerance = 0.01;
 
 function onMouseMove( event ) {
+  
 
 	// calculate mouse position in normalized device coordinates
 	// (-1 to +1) for both components
+  var centerX = window.innerWidth * 0.5;
+  var centerY = window.innerHeight * 0.5;
 
+  camera.position.x = (event.clientX - centerX) * mouseTolerance;
+  camera.position.y = (event.clientY - centerY) * mouseTolerance;
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
@@ -96,7 +118,7 @@ var shapeList = [shape,shape2,shape3,shape4,shape5]*/
 //Add Particles
 function addParticles() {
   const geometry = new Three.SphereGeometry(0.05,24,24);
-  const material = new Three.MeshBasicMaterial({color: 0xfffdc9});
+  const material = new Three.MeshBasicMaterial({color: 0xfff3c9});
   const particle = new Three.Mesh(geometry,material);
   const [x,y,z] = Array(3).fill().map(() => Three.MathUtils.randFloatSpread(100));
   particle.position.set(x,y,z);
@@ -122,12 +144,11 @@ function renderScene() {
   //Move Light Around
   pointLight.position.set(camera.position.x,camera.position.y,camera.position.z)
   //Orbit Camera
-  camera.translateX(0.02)
-  camera.rotateY(0.02)
+  //camera.translateX(0.02)
+  //camera.rotateY(0.02)
   //Helper Controls
   controls.update();
-  controls.enablePan = false;
-  controls.enableZoom = false;
+  controls.enabled = false;
 
   /*/rotate planets
   shape.rotateY(0.002)
@@ -162,12 +183,7 @@ function renderScene() {
   }
   
   //Make all text face camera
-  try {
-    textName.lookAt(camera.position)
-    textContact.lookAt(camera.position)
-  }catch(error) {
-    console.log(error)
-  }
+  
     
   // update the picking ray with the camera and mouse position
 	raycaster.setFromCamera( mouse, camera );
@@ -226,3 +242,5 @@ function renderScene() {
 window.addEventListener('click', onclick, true);
 window.addEventListener( 'mousemove', onMouseMove, false );
 renderScene();
+
+
